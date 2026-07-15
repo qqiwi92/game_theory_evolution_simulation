@@ -1,48 +1,57 @@
 const std = @import("std");
+const Random = std.Random;
 
 pub const Coefficients = struct {
     trust: f32 = 0.5,
     defection: f32 = 0.5,
     alpha: f32 = 0.3,
+
     mut_step: f32 = 0.02,
     longevity: u32 = 10,
 
-    age: u32 = 0,
-    karma: f32 = 0.5,
-
     const Self = @This();
 
-    pub fn initRandom(rand: std.Random) Self {
+    pub fn initRandom(rand: Random) Self {
         return .{
             .trust = rand.float(f32),
             .defection = rand.float(f32),
             .alpha = rand.float(f32),
             .mut_step = 0.005 + (rand.float(f32) * 0.075),
-            .longevity = rand.intRangeAtMost( u32, 5, 15),
-            .karma = 0.5,
+            .longevity = rand.intRangeAtMost(u32, 5, 15),
         };
     }
-    pub fn procreate(parent: *const Self) Self {
+
+    pub fn procreate(parent: *const Self, rand: Random) Self {
+        const step = parent.mut_step;
         return .{
-            .trust = mutate(parent.trust),
-            .defection = mutate(parent.defection),
-            .alpha = mutate(parent.alpha),
-            .mut_step = mutate(parent.mut_step),
-            .karma = mutate(parent.karma),
-            .longevity = mutate(parent.karma),
-            .age = 0,
+            .trust = mutateFloat(parent.trust, step, rand),
+            .defection = mutateFloat(parent.defection, step, rand),
+            .alpha = mutateFloat(parent.alpha, step, rand),
+            .mut_step = @max(0.001, mutateFloat(parent.mut_step, step, rand)),
+            .longevity = mutateInt(parent.longevity, step, rand, 5, 50),
         };
     }
-    fn mutate(self: *Self, field: f32) f32 {
-        _ = self;
-        _ = field;
-        return 0.0;
+
+    fn mutateFloat(val: f32, step: f32, rand: Random) f32 {
+        const noise = rand.floatNorm(f32) * step;
+        return @max(0.0, @min(1.0, val + noise));
+    }
+
+    fn mutateInt(val: u32, step: f32, rand: Random, min: u32, max: u32) u32 {
+        const noise = rand.floatNorm(f32) * @as(f32, @floatFromInt(val)) * step;
+        const delta = @as(i32, @intFromFloat(@round(noise)));
+        const new_val = @as(i32, @intCast(val)) + delta;
+        return @intCast(@max(@as(i32, @intCast(min)), @min(@as(i32, @intCast(max)), new_val)));
     }
 };
 
 pub const Player = struct {
     id: u32,
     coefs: Coefficients,
+
+    age: u32 = 0,
+    karma: f32 = 0.5,
+    score: i32 = 0,
 
     const Self = @This();
 
@@ -59,10 +68,12 @@ pub const Player = struct {
             .coefs = coefs,
         };
     }
-    pub fn initRandom(id: u32) Self {
-        return initWithCoefs(id, Coefficients.initRandom());
+
+    pub fn initRandom(id: u32, rand: Random) Self {
+        return initWithCoefs(id, Coefficients.initRandom(rand));
     }
-    pub fn procreate(self: *const Self, id: u32) Self {
-        return initRandom(self.id + id);
+
+    pub fn procreate(self: *const Self, child_id: u32, rand: Random) Self {
+        return initWithCoefs(child_id, self.coefs.procreate(rand));
     }
 };
