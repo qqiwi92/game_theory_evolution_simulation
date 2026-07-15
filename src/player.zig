@@ -2,15 +2,22 @@ const std = @import("std");
 
 pub const Coefficients = struct {
     trust: f32 = 0.5,
-    carma: f32 = 0.5,
     defection: f32 = 0.5,
-    
-    pub fn initRandom() Coefficients {
+    alpha: f32 = 0.3,
+    mut_step: f32 = 0.02,
+
+    karma: f32 = 0.5,
+
+    const Self = @This();
+
+    pub fn initRandom() Self {
         const rand = std.crypto.random;
-        return Coefficients{
+        return .{
             .trust = rand.float(f32),
-            .carma = rand.float(f32),
+            .karma = 0.5,
             .defection = rand.float(f32),
+            .alpha = rand.float(f32),
+            .mut_step = 0.005 + (rand.float(f32) * 0.075),
         };
     }
 };
@@ -34,7 +41,7 @@ pub const Player = struct {
             .coefs = coefs,
         };
     }
-    pub fn initRandom(id: u32) Self{
+    pub fn initRandom(id: u32) Self {
         return initWithCoefs(id, Coefficients.initRandom());
     }
 };
