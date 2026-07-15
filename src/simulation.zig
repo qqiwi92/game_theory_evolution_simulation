@@ -2,18 +2,23 @@ const std = @import("std");
 const Player = @import("player.zig").Player;
 pub const Simulation = struct {
     allocator: std.mem.Allocator,
-    arena: std.ArrayList(Player),
+    population: std.ArrayList(Player),
     rand: std.Random,
     const Self = @This();
     pub fn init(allocator: std.mem.Allocator, init_entity_count: u32, random: std.Random) !Self {
-        const arena = try std.ArrayList(Player).initCapacity(allocator, init_entity_count);
+        const world = try std.ArrayList(Player).initCapacity(allocator, init_entity_count);
         return .{
             .allocator = allocator,
-            .arena = arena,
+            .population = world,
             .rand = random,
         };
     }
-    pub fn deinit(self: * Self) void {
-        self.arena.deinit(self.allocator);
+    pub fn fillWithRandoms(self: *Self) !void {
+        while (self.population.items.len < self.population.capacity) {
+            try self.population.append(self.allocator, Player.initRandom(@intCast(self.population.items.len), self.rand));
+        }
+    }
+    pub fn deinit(self: *Self) void {
+        self.population.deinit(self.allocator);
     }
 };
