@@ -1,8 +1,14 @@
 const std = @import("std");
-const player = @import("player.zig");
+const Simulation = @import("simulation.zig").Simulation;
 pub fn main() !void {
     var prng = std.Random.DefaultPrng.init(1337);
     const rand = prng.random();
-    const p = player.Player.initRandom(0, rand);
-    _ = p.procreate(2, rand);
+
+    var gpa = std.heap.DebugAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const population = 100;
+    var sim = try Simulation.init(allocator, population, rand);
+    sim.deinit();
 }
