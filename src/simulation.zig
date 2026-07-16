@@ -1,5 +1,7 @@
 const std = @import("std");
 const Player = @import("player.zig").Player;
+const Weights = @import("weights.zig");
+
 pub const Simulation = struct {
     allocator: std.mem.Allocator,
     population: std.ArrayList(Player),
@@ -28,16 +30,24 @@ pub const Simulation = struct {
         }
     }
     pub fn fight(self: *Self) !void {
-        self.rand.shuffle(u32, self.ids);
+        self.rand.shuffle(u32, self.ids.items);
 
         var i: usize = 0;
         const population = (self.ids.items.len / 2) * 2;
         while (i < population) : (i += 2) {
-            const first: *Player = self.population[i];
-            const second: *Player = self.population[i + 1];
+            var first: *Player = &self.population.items[i];
+            var second: *Player = &self.population.items[i + 1];
 
-            _ = first;
-            _ = second;
+            const first_verdict = first.fight(self.rand, second);
+            const second_verdict = second.fight(self.rand, first);
+
+            const payoff = Weights.getPayoff(first_verdict, second_verdict);
+
+            first.score += payoff.p1;
+            second.score += payoff.p2;
+
+            first.growOlder();
+            second.growOlder();
         }
     }
     pub fn deinit(self: *Self) void {
