@@ -1,8 +1,8 @@
 const std = @import("std");
 const Simulation = @import("simulation.zig").Simulation;
 pub fn main(init: std.process.Init) !void {
-    const population = 100;
-    const epochs = 100000;
+    const population = 200;
+    const epochs = 2000;
 
     var prng = std.Random.DefaultPrng.init(1337);
     const rand = prng.random();
@@ -18,7 +18,7 @@ pub fn main(init: std.process.Init) !void {
     var writer_buf: [1024 * 64]u8 = undefined;
     var buf_writer = file.writer(io, &writer_buf);
     const writer = &buf_writer.interface;
-    try writer.print("epoch,player_id,trust,defection,alpha,karma\n", .{});
+    try writer.print("epoch,player_id,trust,defection,age,karma\n", .{});
     defer buf_writer.flush() catch {};
 
     var sim = try Simulation.init(allocator, population, rand);
@@ -28,9 +28,9 @@ pub fn main(init: std.process.Init) !void {
     for (0..epochs) |e| {
         try sim.fight();
         sim.cullTheWeak(10);
-        if (e % 100 == 0) {
+        // if (e % 1000 == 0) {
             try sim.logEpoch(e, writer);
-        }
+        // }
     }
     // std.debug.print("{}\n", .{sim.population.items[0]});
     // std.debug.print("{}\n", .{sim.population.items[1]});

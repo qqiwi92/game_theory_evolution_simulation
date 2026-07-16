@@ -17,7 +17,6 @@ pub const Coefficients = struct {
         return .{
             .trust = rand.float(f32),
             .defection = rand.float(f32),
-            .alpha = rand.float(f32),
             .mut_step = 0.005 + (rand.float(f32) * 0.075),
             .longevity = rand.intRangeAtMost(u32, 5, 15),
         };
@@ -28,7 +27,6 @@ pub const Coefficients = struct {
         return .{
             .trust = mutateFloat(parent.trust, step, rand),
             .defection = mutateFloat(parent.defection, step, rand),
-            .alpha = mutateFloat(parent.alpha, step, rand),
             .mut_step = @max(0.001, mutateFloat(parent.mut_step, step, rand)),
             .longevity = mutateInt(parent.longevity, step, rand, 5, 50),
         };

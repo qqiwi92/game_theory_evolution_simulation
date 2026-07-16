@@ -1,8 +1,8 @@
 const std = @import("std");
 
 pub const Choice = enum(u1) {
-    cooperate = 0,
-    defect = 1,
+    defect = 0,
+    cooperate = 1,
 };
 
 pub const Payoff = struct {
@@ -12,12 +12,12 @@ pub const Payoff = struct {
 
 pub const payoff_matrix = [2][2]Payoff{
     .{
-        .{ .p1 = 3, .p2 = 3 },
-        .{ .p1 = 0, .p2 = 5 },
+        .{ .p1 = -1, .p2 = -1 },
+        .{ .p1 = 5, .p2 = 0 },
     },
     .{
-        .{ .p1 = 5, .p2 = 0 },
-        .{ .p1 = 1, .p2 = 1 },
+        .{ .p1 = 0, .p2 = 5 },
+        .{ .p1 = 3, .p2 = 3 },
     },
 };
 

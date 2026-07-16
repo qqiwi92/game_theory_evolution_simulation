@@ -37,7 +37,8 @@ pub const Simulation = struct {
         while (i < population) : (i += 2) {
             var first: *Player = &self.population.items[self.ids.items[i]];
             var second: *Player = &self.population.items[self.ids.items[i + 1]];
-
+            first.score = @divTrunc(first.score, 10);
+            second.score = @divTrunc(second.score, 10);
             const first_verdict = first.fight(self.rand, second);
             const second_verdict = second.fight(self.rand, first);
 
@@ -54,6 +55,12 @@ pub const Simulation = struct {
     }
 
     pub fn cullTheWeak(self: *Self, elimination_factor: u32) void {
+        for (self.population.items) |*p| {
+            if (p.age >= p.coefs.longevity) {
+                p.score = -999999;
+            }
+        }
+
         std.mem.sort(Player, self.population.items, {}, sortPlayerDescComparatorAsc);
 
         const players = self.population.items;
@@ -61,7 +68,8 @@ pub const Simulation = struct {
         const eliminated = size / elimination_factor;
 
         for (0..eliminated) |i| {
-            players[i].resetAsDescendant(&players[size - i - 1].coefs, self.rand);
+            const parent_idx = size - 1 - (self.rand.int(usize) % (size / 2));
+            players[i].resetAsDescendant(&players[parent_idx].coefs, self.rand);
         }
     }
 
@@ -72,7 +80,7 @@ pub const Simulation = struct {
                 p.id,
                 p.coefs.trust,
                 p.coefs.defection,
-                p.coefs.alpha,
+                p.age,
                 p.karma,
             });
         }

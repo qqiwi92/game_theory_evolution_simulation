@@ -3,7 +3,7 @@
 I was wondering, how to make a classical game theory problem more similar to life. So in this case players die when they are betrayed, and the winner reproduces, passing their genes. I also added mutations to see what the system will evolve into.
 
 ## Coefficients
-- karma - EMA (Exponential Moving Average) coefficient that shows reputation of a player. This is the magic component, that adds space for different strategies.
+- karma - EMA (Exponential Moving Average) coefficient that shows reputation of a player. This is the magic component, that adds space for different strategies. 0 is a not cooperative at all, 1 is always cooperative.
 - age - nto prevent exponential growth
 - maybe I will also add luck here but I really don't convolute this, so that's all for now.
 
