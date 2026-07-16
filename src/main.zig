@@ -15,7 +15,7 @@ pub fn main(init: std.process.Init) !void {
     const cwd = std.Io.Dir.cwd();
     const file = try cwd.createFile(io, "simulation_log.csv", .{});
     defer file.close(io);
-    var writer_buf: [4096]u8 = undefined;
+    var writer_buf: [1024 * 64]u8 = undefined;
     var buf_writer = file.writer(io, &writer_buf);
     const writer = &buf_writer.interface;
     try writer.print("epoch,player_id,trust,defection,alpha,karma\n", .{});
@@ -28,8 +28,10 @@ pub fn main(init: std.process.Init) !void {
     for (0..epochs) |e| {
         try sim.fight();
         sim.cullTheWeak(10);
-        try sim.logEpoch(e, writer);
+        if (e % 100 == 0) {
+            try sim.logEpoch(e, writer);
+        }
     }
-    std.debug.print("{}\n", .{sim.population.items[0]});
-    std.debug.print("{}\n", .{sim.population.items[1]});
+    // std.debug.print("{}\n", .{sim.population.items[0]});
+    // std.debug.print("{}\n", .{sim.population.items[1]});
 }

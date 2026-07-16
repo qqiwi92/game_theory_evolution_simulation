@@ -47,7 +47,9 @@ pub const Simulation = struct {
             second.score += payoff.p2;
 
             first.growOlder();
+            first.updateKarma(first_verdict);
             second.growOlder();
+            second.updateKarma(second_verdict);
         }
     }
 

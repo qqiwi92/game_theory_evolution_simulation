@@ -92,4 +92,8 @@ pub const Player = struct {
         self.karma = 0.5;
         self.score = 0;
     }
+    pub fn updateKarma(self: *Self, choice: Choice) void {
+        const choice_val = @intFromEnum(choice);
+        self.karma = choice_val * self.coefs.alpha + self.karma * (1 - self.coefs.alpha);
+    }
 };
