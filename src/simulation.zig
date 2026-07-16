@@ -37,15 +37,15 @@ pub const Simulation = struct {
         while (i < population) : (i += 2) {
             var first: *Player = &self.population.items[self.ids.items[i]];
             var second: *Player = &self.population.items[self.ids.items[i + 1]];
-            first.score = @divTrunc(first.score, 10);
-            second.score = @divTrunc(second.score, 10);
+            first.score = first.score * 0.9;
+            second.score = second.score * 0.9;
             const first_verdict = first.fight(self.rand, second);
             const second_verdict = second.fight(self.rand, first);
 
             const payoff = Weights.getPayoff(first_verdict, second_verdict);
 
-            first.score += payoff.p1;
-            second.score += payoff.p2;
+            first.score += @as(f32, @floatFromInt(payoff.p1));
+            second.score += @as(f32, @floatFromInt(payoff.p2));
 
             first.growOlder();
             first.updateKarma(first_verdict);
@@ -55,24 +55,33 @@ pub const Simulation = struct {
     }
 
     pub fn cullTheWeak(self: *Self, elimination_factor: u32) void {
-        for (self.population.items) |*p| {
+        const players = self.population.items;
+        const size = players.len;
+
+        const procreation_cost: f32 = 5.0;
+
+        for (players) |*p| {
             if (p.age >= p.coefs.longevity) {
-                p.score = -999999;
+                const parent_idx = size - 1 - (self.rand.int(usize) % (size / 2));
+                var parent = &players[parent_idx];
+
+                parent.score -= procreation_cost;
+
+                p.resetAsDescendant(&parent.coefs, self.rand);
             }
         }
 
-        std.mem.sort(Player, self.population.items, {}, sortPlayerDescComparatorAsc);
+        std.mem.sort(Player, players, {}, sortPlayerDescComparatorAsc);
 
-        const players = self.population.items;
-        const size = players.len;
         const eliminated = size / elimination_factor;
-
         for (0..eliminated) |i| {
             const parent_idx = size - 1 - (self.rand.int(usize) % (size / 2));
-            players[i].resetAsDescendant(&players[parent_idx].coefs, self.rand);
+            var parent = &players[parent_idx];
+
+            parent.score -= procreation_cost;
+            players[i].resetAsDescendant(&parent.coefs, self.rand);
         }
     }
-
     pub fn logEpoch(self: *Self, epoch: usize, writer: *std.Io.Writer) !void {
         for (self.population.items) |p| {
             try writer.print("{d},{d},{d:.4},{d:.4},{d:.4},{d:.4}\n", .{

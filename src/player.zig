@@ -51,8 +51,8 @@ pub const Player = struct {
 
     age: u32 = 0,
     karma: f32 = 0.5,
-    score: i32 = 0,
-
+    score: f32 = 10.0,
+    
     const Self = @This();
 
     pub fn init(id: u32) Self {
@@ -88,7 +88,7 @@ pub const Player = struct {
 
         self.age = 0;
         self.karma = 0.5;
-        self.score = 0;
+        self.score = 5.0;
     }
     pub fn updateKarma(self: *Self, choice: Choice) void {
         const choice_val = @intFromEnum(choice);

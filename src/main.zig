@@ -2,7 +2,7 @@ const std = @import("std");
 const Simulation = @import("simulation.zig").Simulation;
 pub fn main(init: std.process.Init) !void {
     const population = 200;
-    const epochs = 2000;
+    const epochs = 20000;
 
     var prng = std.Random.DefaultPrng.init(1337);
     const rand = prng.random();
@@ -28,9 +28,9 @@ pub fn main(init: std.process.Init) !void {
     for (0..epochs) |e| {
         try sim.fight();
         sim.cullTheWeak(10);
-        // if (e % 1000 == 0) {
+        if (e % 100 == 0) {
             try sim.logEpoch(e, writer);
-        // }
+        }
     }
     // std.debug.print("{}\n", .{sim.population.items[0]});
     // std.debug.print("{}\n", .{sim.population.items[1]});
