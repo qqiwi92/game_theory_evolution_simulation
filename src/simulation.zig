@@ -50,8 +50,24 @@ pub const Simulation = struct {
             second.growOlder();
         }
     }
+
+    pub fn cullTheWeak(self: *Self, elimination_factor: u32) void {
+        std.mem.sort(Player, self.population.items, {}, sortPlayerDescComparatorAsc);
+
+        const players = self.population.items;
+        const size = players.len;
+        const eliminated = size / elimination_factor;
+
+        for (0..eliminated) |i| {
+            players[i].resetAsDescendant(&players[size - i - 1].coefs, self.rand);
+        }
+    }
+
     pub fn deinit(self: *Self) void {
         self.population.deinit(self.allocator);
         self.ids.deinit(self.allocator);
+    }
+    fn sortPlayerDescComparatorAsc(_: void, a: Player, b: Player) bool {
+        return a.score < b.score;
     }
 };

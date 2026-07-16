@@ -1,6 +1,9 @@
 const std = @import("std");
 const Simulation = @import("simulation.zig").Simulation;
 pub fn main() !void {
+    const population = 100;
+    const epochs = 100;
+
     var prng = std.Random.DefaultPrng.init(1337);
     const rand = prng.random();
 
@@ -8,10 +11,14 @@ pub fn main() !void {
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    const population = 100;
     var sim = try Simulation.init(allocator, population, rand);
     defer sim.deinit();
     try sim.fillWithRandoms();
-    
-    // std.debug.print("{}\n", .{sim.population}); 
+
+    for (0..epochs) |_| {
+        try sim.fight();
+        sim.cullTheWeak(10);
+    }
+    std.debug.print("{}\n", .{sim.population.items[0]});
+    std.debug.print("{}\n", .{sim.population.items[1]});
 }

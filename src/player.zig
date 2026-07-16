@@ -85,4 +85,11 @@ pub const Player = struct {
     pub fn growOlder(self: *Self) void {
         self.age += 1;
     }
+    pub fn resetAsDescendant(self: *Self, parent_coefs: *const Coefficients, rand: Random) void {
+        self.coefs = parent_coefs.procreate(rand);
+
+        self.age = 0;
+        self.karma = 0.5;
+        self.score = 0;
+    }
 };
