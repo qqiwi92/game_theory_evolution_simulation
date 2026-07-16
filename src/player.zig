@@ -1,4 +1,6 @@
 const std = @import("std");
+const Choice = @import("weights.zig").Choice;
+
 const Random = std.Random;
 
 pub const Coefficients = struct {
@@ -75,5 +77,12 @@ pub const Player = struct {
 
     pub fn procreate(self: *const Self, child_id: u32, rand: Random) Self {
         return initWithCoefs(child_id, self.coefs.procreate(rand));
+    }
+    pub fn fight(self: *Self, rand: std.Random, other: *const Self) Choice {
+        const verdict = self.coefs.trust * other.karma + (1 - self.coefs.defection) * (1 - other.karma);
+        return if (rand.float(f32) < verdict) Choice.cooperate else Choice.defect;
+    }
+    pub fn growOlder(self: *Self) void {
+        self.age += 1;
     }
 };
