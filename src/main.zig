@@ -10,5 +10,8 @@ pub fn main() !void {
 
     const population = 100;
     var sim = try Simulation.init(allocator, population, rand);
-    sim.deinit();
+    defer sim.deinit();
+    try sim.fillWithRandoms();
+    
+    // std.debug.print("{}\n", .{sim.population}); 
 }
