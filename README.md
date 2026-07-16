@@ -13,3 +13,11 @@ I was wondering, how to make a classical game theory problem more similar to lif
 - alpha - not a gene per se, but a coefficient that shows how fast karma can change. I thought it would be fun to make it a gene too. It acts like a likeability or luck parameter.
 - mut_step - how much evolution are we talking about. Cool that this parameter is also changeable
 - longevity - to prevent exponential growth
+
+
+## Results
+In the first iterions i had dull results with only selfish strategies surviving through time. I had to tweak the reward to get results like these. Here we see drastic changes in pretty short period of time - the behavior changes drasticly - my hypothesis is that this is the closest to tit for tat strategy (arguably the optimal one) that can be achieved without sequential interactions between players.
+<img width="932" height="1009" alt="image" src="https://github.com/user-attachments/assets/67a38386-aa25-4ed2-b641-ff9121b61252" />
+
+
+<img width="932" height="1009" alt="image" src="https://github.com/user-attachments/assets/241f236f-a417-4438-95dc-9287d504ef41" />
