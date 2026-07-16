@@ -35,8 +35,8 @@ pub const Simulation = struct {
         var i: usize = 0;
         const population = (self.ids.items.len / 2) * 2;
         while (i < population) : (i += 2) {
-            var first: *Player = &self.population.items[i];
-            var second: *Player = &self.population.items[i + 1];
+            var first: *Player = &self.population.items[self.ids.items[i]];
+            var second: *Player = &self.population.items[self.ids.items[i + 1]];
 
             const first_verdict = first.fight(self.rand, second);
             const second_verdict = second.fight(self.rand, first);
@@ -60,6 +60,19 @@ pub const Simulation = struct {
 
         for (0..eliminated) |i| {
             players[i].resetAsDescendant(&players[size - i - 1].coefs, self.rand);
+        }
+    }
+
+    pub fn logEpoch(self: *Self, epoch: usize, writer: *std.Io.Writer) !void {
+        for (self.population.items) |p| {
+            try writer.print("{d},{d},{d:.4},{d:.4},{d:.4},{d:.4}\n", .{
+                epoch,
+                p.id,
+                p.coefs.trust,
+                p.coefs.defection,
+                p.coefs.alpha,
+                p.karma,
+            });
         }
     }
 
